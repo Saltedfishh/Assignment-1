@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>as1</title>
+</head>
+<body>
+    <h1 style="text-align:center">TimeBlocks</h1>
+    <button onclick="addRow()">Add Time Block</button>
+    <table id="blocks">
+        <tr>
+            <th>Time Block Name</th>
+            <th>Minutes</th>
+            <th>Operations</th>
+        </tr>
+        <tr>
+            <td>Greeting</td>
+            <td>30</td>
+            <td>
+                <button onclick="editRow(this)">Edit</button><button onclick="deleteRow(this)">Delete</button>
+            </td>
+        </tr>
+        <script src="./as1func1.js"></script>
+    </table>
+</body>
+
+</html>
