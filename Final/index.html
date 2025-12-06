@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Timeblocks Agenda Timer</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <div class="timer-display" id="timerDisplay">00:00</div>
+
+        <div class="card">
+            <h3>Your Time Blocks</h3>
+            <div id="timeBlocksList">
+                </div>
+
+            <hr>
+
+            <h4>Add Time Block</h4>
+            <div class="add-block-form">
+                <input type="text" id="taskNameInput" placeholder="Task Name (e.g., Intro)">
+                <input type="number" id="taskMinutesInput" placeholder="Minutes" value="10" min="1">
+                <button onclick="addTimeBlock()">+ Add</button>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button id="startStopBtn" onclick="toggleTimer()">Start timer</button>
+            <button id="pauseResumeBtn" style="display: none;" onclick="pauseResumeTimer()">Pause</button>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
