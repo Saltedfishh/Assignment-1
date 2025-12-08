@@ -100,3 +100,84 @@ function updateTotalTime() {
     const totalDuration = timeBlocks.reduce((sum, block) => sum + block.duration, 0);
     updateDisplay(totalDuration);
 }
+// --- Feature 2: Export and Import Sub-task and time configuration as a CSV file ---
+
+/**
+ * Exports the current time blocks configuration as a CSV file.
+ */
+function exportBlocks() {
+    // Define the CSV header
+    let csvContent = "TaskName,Duration(Minutes)\n";
+
+    // Convert data to CSV format
+    timeBlocks.forEach(block => {
+        const minutes = block.duration / 60; // Convert seconds back to minutes
+        // CSV should handle commas in names by wrapping them in quotes, but we'll keep it simple
+        csvContent += `${block.name},${minutes}\n`;
+    });
+
+    // Create a Blob and download link
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement("a");
+    const url = URL.createObjectURL(blob);
+    
+    link.setAttribute("href", url);
+    link.setAttribute("download", "timeblocks_agenda.csv");
+    link.style.visibility = 'hidden';
+    
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
+/**
+ * Imports time blocks from a selected CSV file.
+ */
+function importBlocks(event) {
+    if (isRunning) {
+        alert("Cannot import blocks while the timer is running. Please stop the timer first.");
+        return;
+    }
+
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const text = e.target.result;
+        const lines = text.split('\n').filter(line => line.trim() !== '');
+        
+        // Clear existing blocks and parse CSV
+        timeBlocks = [];
+        
+        // Skip header line (TaskName,Duration(Minutes))
+        for (let i = 1; i < lines.length; i++) {
+            const [name, minutesStr] = lines[i].split(',');
+            const minutes = parseFloat(minutesStr);
+            
+            if (name && !isNaN(minutes) && minutes > 0) {
+                // Add block by calling the existing helper function, which converts to seconds
+                addTimeBlock(name.trim(), minutes);
+            }
+        }
+        
+        // Finalize import
+        renderTimeBlocks();
+        updateTotalTime();
+        alert(`Successfully imported ${timeBlocks.length} time blocks.`);
+    };
+
+    reader.readAsText(file);
+}
+
+// --- Initialization ---
+
+// Initial call to set the display when the page loads
+document.addEventListener('DOMContentLoaded', () => {
+    // Example Initial Block (can be removed later)
+    addTimeBlock("Project Overview", 5); 
+    addTimeBlock("Feature Discussion", 10);
+    addTimeBlock("Action Items", 5);
+
+    updateTotalTime(); // Sets the initial timer to total duration
+});
