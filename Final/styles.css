@@ -51,3 +51,31 @@ button {
     color: white;
     width: 20%;
 }
+
+/* Control Buttons */
+.controls button, .io-controls button {
+    width: 100%;
+    margin-top: 10px;
+    background-color: #333;
+    color: white;
+}
+
+/* List Item Styling for Time Blocks */
+.time-block-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+}
+
+.time-block-item:last-child {
+    border-bottom: none;
+}
+
+/* Highlight the current running block */
+.current-block {
+    background-color: #e6f7ff;
+    border: 2px solid #00aaff;
+    border-radius: 5px;
+}

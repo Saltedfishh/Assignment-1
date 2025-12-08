@@ -100,6 +100,150 @@ function updateTotalTime() {
     const totalDuration = timeBlocks.reduce((sum, block) => sum + block.duration, 0);
     updateDisplay(totalDuration);
 }
+
+// --- Feature 3: Start/Pause/Resume Timer and Logic ---
+
+/**
+ * Initiates or resets the timer.
+ */
+function toggleTimer() {
+    if (isRunning) {
+        // Stop logic
+        stopTimer();
+    } else {
+        // Start logic
+        if (timeBlocks.length === 0) {
+            alert('Please add at least one time block to start the timer.');
+            return;
+        }
+        
+        // Reset state for a new run
+        currentBlockIndex = 0;
+        isRunning = true;
+        isPaused = false;
+        
+        // Start with the first block
+        timeRemaining = timeBlocks[currentBlockIndex].duration;
+        
+        // Update button states
+        document.getElementById('startStopBtn').textContent = 'Stop Timer';
+        document.getElementById('pauseResumeBtn').textContent = 'Pause';
+        document.getElementById('pauseResumeBtn').style.display = 'inline-block';
+        document.getElementById('modifyBtn').style.display = 'none'; // Hide Modify button when running
+        
+        startCountdown();
+    }
+}
+
+/**
+ * Stops the timer and resets the state.
+ */
+function stopTimer() {
+    clearInterval(timerInterval);
+    timerInterval = null;
+    isRunning = false;
+    isPaused = false;
+    currentBlockIndex = 0;
+    
+    // Reset buttons and display
+    document.getElementById('startStopBtn').textContent = 'Start Timer';
+    document.getElementById('pauseResumeBtn').style.display = 'none';
+    document.getElementById('modifyBtn').style.display = 'none';
+    renderTimeBlocks(); // Remove current-block highlight
+    updateTotalTime(); // Display total time again
+}
+
+/**
+ * Main countdown loop.
+ */
+function startCountdown() {
+    // Clear any existing interval to prevent duplicates
+    if (timerInterval) clearInterval(timerInterval);
+    
+    // Highlight the current block
+    renderTimeBlocks(); 
+
+    timerInterval = setInterval(() => {
+        if (timeRemaining <= 0) {
+            // Move to the next block
+            currentBlockIndex++;
+
+            if (currentBlockIndex < timeBlocks.length) {
+                // Next task available
+                timeRemaining = timeBlocks[currentBlockIndex].duration;
+                renderTimeBlocks(); // Re-render to highlight new block
+            } else {
+                // All blocks completed
+                alert('All time blocks completed!');
+                stopTimer();
+                return;
+            }
+        }
+
+        // Decrement time
+        timeRemaining--;
+        updateDisplay(timeRemaining);
+    }, 1000); // 1 second interval
+}
+
+/**
+ * Pauses or resumes the timer.
+ */
+function pauseResumeTimer() {
+    if (isPaused) {
+        // Resume logic
+        isPaused = false;
+        document.getElementById('pauseResumeBtn').textContent = 'Pause';
+        document.getElementById('modifyBtn').style.display = 'none'; // Hide modify button
+        startCountdown(); // Restart the interval
+    } else {
+        // Pause logic
+        isPaused = true;
+        clearInterval(timerInterval);
+        document.getElementById('pauseResumeBtn').textContent = 'Resume';
+        document.getElementById('modifyBtn').style.display = 'inline-block'; // Show modify button
+        // Keep the display as is
+    }
+}
+
+// --- Feature 3 (Modification Part): Allow users to modify sub-tasks (e.g. add 10 more minutes) ---
+
+/**
+ * Placeholder function to show a modification interface or prompt.
+ * In a real application, this would open a modal/dialog.
+ */
+function showModifyInterface() {
+    if (!isPaused || !isRunning) {
+        alert("Modification is only allowed when the timer is paused.");
+        return;
+    }
+    
+    const minutesToAdd = parseInt(prompt("Timer is paused. Enter MINUTES to add to the current task:"));
+
+    if (isNaN(minutesToAdd) || minutesToAdd === null) {
+        // User cancelled or entered non-number
+        return;
+    }
+
+    if (minutesToAdd < 0) {
+        alert("Please enter a positive value.");
+        return;
+    }
+    
+    // Add time to the running task's remaining time AND the original duration
+    const secondsToAdd = minutesToAdd * 60;
+    timeRemaining += secondsToAdd;
+    timeBlocks[currentBlockIndex].duration += secondsToAdd;
+    
+    // Re-calculate the durations for all *future* tasks to shift them down in the list
+    // A simpler approach is to only modify the current block's remaining time
+    // For this basic implementation, we will update the *current block's* original duration
+    // and the *remaining* time for the user to resume.
+
+    updateDisplay(timeRemaining);
+    renderTimeBlocks(); // Re-render to update the current block's duration string
+    alert(`Added ${minutesToAdd} minutes to the current task (${timeBlocks[currentBlockIndex].name}). Click Resume to continue.`);
+}
 // --- Feature 2: Export and Import Sub-task and time configuration as a CSV file ---
 
 /**
