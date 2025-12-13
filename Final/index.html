@@ -26,7 +26,7 @@
         </div>
 
         <div class="controls">
-            <button id="startStopBtn" onclick="toggleTimer()"gi>Start timer</button>
+            <button id="startStopBtn" onclick="toggleTimer()">Start timer</button>
             <button id="pauseResumeBtn" style="display: none;" onclick="pauseResumeTimer()">Pause</button>
         </div>
 
@@ -34,11 +34,16 @@
             <button onclick="exportBlocks()">Export CSV</button>
             <input type="file" id="importFile" accept=".csv" style="display: none;" onchange="importBlocks(event)">
             <button onclick="document.getElementById('importFile').click()">Import CSV</button>
+            
             <button id="modifyBtn" style="display: none;" onclick="showModifyInterface()">Modify Time</button>
+        </div>
+        <div class="card" id="noteSection" style="display: none; margin-top: 20px;">
+            <h4>Meeting Notes</h4>
+            <textarea id="noteInput" placeholder="Enter notes related to the current discussion..." rows="3"></textarea>
+            <button onclick="saveNote()" style="background-color: #007bff; width: 100%;">Save Note</button>
         </div>
     </div>
 
     <script src="script.js"></script>
 </body>
 </html>
-

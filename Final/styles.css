@@ -20,44 +20,18 @@ body {
     margin-bottom: 20px;
 }
 
-.card {
-    background: white;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    margin-bottom: 20px;
-}
-/* Input and Button Styling */
-input[type="text"], input[type="number"] {
-    padding: 10px;
-    margin-right: 5px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    width: 35%; /* Adjusting width for the add form */
+/* Feature 2 (Individual): Warning System Style */
+.warning-time {
+    color: #ff9900; /* Orange color for warning */
+    animation: pulse 1s infinite alternate;
 }
 
-button {
-    padding: 10px 15px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-weight: bold;
-    transition: background-color 0.3s;
+@keyframes pulse {
+    from { opacity: 1; }
+    to { opacity: 0.8; }
 }
 
-.add-block-form button {
-    background-color: #4CAF50;
-    color: white;
-    width: 20%;
-}
 
-/* Control Buttons */
-.controls button, .io-controls button {
-    width: 100%;
-    margin-top: 10px;
-    background-color: #333;
-    color: white;
-}
 /* List Item Styling for Time Blocks */
 .time-block-item {
     display: flex;
@@ -76,4 +50,20 @@ button {
     background-color: #e6f7ff;
     border: 2px solid #00aaff;
     border-radius: 5px;
+}
+
+/* Feature 3 (Individual): Dynamic Reallocation Interface Styles */
+.reallocation-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px dashed #eee;
+}
+.reallocation-item button {
+    background-color: #dc3545; /* Red for 'Borrow' action */
+    color: white;
+    width: auto;
+    padding: 5px 10px;
+    margin-left: 10px;
 }
