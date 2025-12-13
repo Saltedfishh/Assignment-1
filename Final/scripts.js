@@ -6,8 +6,7 @@ let timerInterval = null;
 let isRunning = false;
 let isPaused = false;
 
-
-// --- Feature 1: Specify Sub-tasks and Time & Display ---
+/** feature_1
 
 /**
  * Adds a new task block to the timeBlocks array.
@@ -100,3 +99,4 @@ function updateTotalTime() {
     const totalDuration = timeBlocks.reduce((sum, block) => sum + block.duration, 0);
     updateDisplay(totalDuration);
 }
+
