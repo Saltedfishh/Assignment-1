@@ -25,10 +25,11 @@
             </div>
         </div>
 
-        <div class="io-controls">
-            <button onclick="exportBlocks()">Export CSV</button>
-            <input type="file" id="importFile" accept=".csv" style="display: none;" onchange="importBlocks(event)">
-            <button onclick="document.getElementById('importFile').click()">Import CSV</button>
+        <div class="controls">
+            <button id="startStopBtn" onclick="toggleTimer()">Start timer</button>
+            <button id="pauseResumeBtn" style="display: none;" onclick="pauseResumeTimer()">Pause</button>
+        </div>
+
     </div>
 
     <script src="script.js"></script>
