@@ -30,6 +30,51 @@ body {
     from { opacity: 1; }
     to { opacity: 0.8; }
 }
+
+.card {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+}
+
+/* Input and Button Styling */
+input[type="text"], input[type="number"], textarea {
+    padding: 10px;
+    margin-right: 5px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    width: 95%; /* Full width for text area and inputs */
+    margin-bottom: 10px;
+}
+.add-block-form input {
+    width: 35%; 
+}
+
+button {
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.3s;
+}
+
+.add-block-form button {
+    background-color: #4CAF50;
+    color: white;
+    width: 20%;
+}
+
+/* Control Buttons */
+.controls button, .io-controls button {
+    width: 100%;
+    margin-top: 10px;
+    background-color: #333;
+    color: white;
+}
+
 /* List Item Styling for Time Blocks */
 .time-block-item {
     display: flex;

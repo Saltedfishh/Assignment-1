@@ -1,6 +1,5 @@
 // --- Global State Variables ---
 let timeBlocks = []; // Array to hold all task objects: [{name: 'Task 1', duration: 300, notes: []}, ...] (duration in seconds)
-let timeBlocks = []; // Array to hold all task objects: [{name: 'Task 1', duration: 300, notes: []}, ...] (duration in seconds)
 let currentBlockIndex = 0;
 let timeRemaining = 0; // Time in seconds
 let timerInterval = null;
@@ -13,6 +12,9 @@ let warningAlerted = false; // Flag to ensure the warning only triggers once per
 
 // --- Feature 1 (Yang Pan): Meeting Note Integration ---
 let meetingNotes = []; // Stores all notes: [{blockIndex: 0, timeRemaining: 120, note: "Decision made"}, ...]
+
+// --- Feature 3 (Xingjian Zhang): Dynamic Time Reallocation (Setup) ---
+let timeBlocksContainer = null; // Reference to the list container for modification logic
 
 // --- Basic Features (1, 2, 3) Implementation ---
 
@@ -58,8 +60,21 @@ function renderTimeBlocks() {
         div.className = `time-block-item ${index === currentBlockIndex && isRunning ? 'current-block' : ''}`;
         div.id = `block-${index}`;
 
-        // Add the 'modifiable' class for Feature 3 (Dynamic Reallocation) targetting
+        // Add the 'modifiable' class for Feature 3 (Dynamic Reallocation) targetting--Xingjian Zhang
+    if (index > currentBlockIndex && isRunning) {
+             div.classList.add('modifiable-future-block');
+        } else {
+             div.classList.remove('modifiable-future-block');
+        }
 
+        div.innerHTML = `
+            <span>${index + 1}. ${block.name}</span>
+            <span class="block-duration">${timeStr}</span>
+            <button onclick="removeTimeBlock(${index})" ${isRunning ? 'disabled' : ''}>X</button>
+        `;
+        timeBlocksContainer.appendChild(div);
+    });
+}
 // ... (updateDisplay and updateTotalTime functions remain the same) ...
 
 function updateDisplay(totalSeconds) {
@@ -171,6 +186,32 @@ function startCountdown() {
         updateDisplay(timeRemaining);
     }, 1000); 
 }
+
+// --- Feature 3 (Basic) Modification (Modified by Xingjian Zhang) ---
+
+function showModifyInterface() {
+    if (!isPaused || !isRunning) {
+        alert("Modification is only allowed when the timer is paused.");
+        return;
+    }
+    
+    // Display the dynamic reallocation interface instead of a simple prompt
+    showDynamicReallocationInterface();
+}
+
+/**
+ * Basic Time Addition to Current Task (Part of Basic Feature 3)
+ */
+function basicAddTime(minutes) {
+    const secondsToAdd = minutes * 60;
+    timeRemaining += secondsToAdd;
+    timeBlocks[currentBlockIndex].duration += secondsToAdd;
+    
+    updateDisplay(timeRemaining);
+    renderTimeBlocks();
+    alert(`Added ${minutes} minutes to the current task (${timeBlocks[currentBlockIndex].name}). Click Resume to continue.`);
+}
+
 // --- Feature 1 (Individual): Meeting Note Integration ---
 
 /**
@@ -217,3 +258,156 @@ function pauseResumeTimer() {
         // The dynamic reallocation interface can be shown via the Modify button
     }
 }
+
+// --- Feature 3 (Individual): Dynamic Time Reallocation ---
+
+/**
+ * Shows the interface for dynamic reallocation.
+ */
+function showDynamicReallocationInterface() {
+    // 1. Show a basic input for adding time to the current task (Basic F3 enhancement)
+    const currentTaskName = timeBlocks[currentBlockIndex].name;
+    const interfaceContainer = document.getElementById('reallocationInterface');
+    
+    interfaceContainer.innerHTML = `
+        <p><strong>Current Task:</strong> ${currentTaskName}</p>
+        <hr>
+        <h4>1. Quick Add to Current Task (Basic F3)</h4>
+        <button onclick="basicAddTime(5)">+ 5 Min</button>
+        <button onclick="basicAddTime(10)">+ 10 Min</button>
+        
+        <h4 style="margin-top: 15px;">2. Dynamic Reallocation (Individual F3)</h4>
+        <p>Borrow time from a future task:</p>
+        <div id="reallocationList">
+            </div>
+        <button onclick="pauseResumeTimer()">Close / Resume</button>
+    `;
+
+    interfaceContainer.style.display = 'block';
+    
+    // 2. Populate the reallocation list with future tasks
+    const reallocationList = document.getElementById('reallocationList');
+    reallocationList.innerHTML = '';
+    
+    timeBlocks.forEach((block, index) => {
+        if (index > currentBlockIndex) {
+            const minutes = Math.floor(block.duration / 60);
+            if (minutes > 0) { // Only allow borrowing from tasks with duration > 0
+                const item = document.createElement('div');
+                item.className = 'reallocation-item';
+                item.innerHTML = `
+                    <span>${index + 1}. ${block.name} (${minutes} min)</span>
+                    <button onclick="promptBorrowTime(${index})">Borrow</button>
+                `;
+                reallocationList.appendChild(item);
+            }
+        }
+    });
+}
+
+/**
+ * Hides the interface for dynamic reallocation.
+ */
+function hideDynamicReallocationInterface() {
+    document.getElementById('reallocationInterface').style.display = 'none';
+}
+
+/**
+ * Prompts user for time to borrow and executes the transfer.
+ * @param {number} sourceIndex - Index of the future task to borrow from.
+ */
+function promptBorrowTime(sourceIndex) {
+    const sourceTask = timeBlocks[sourceIndex];
+    const sourceMinutes = Math.floor(sourceTask.duration / 60);
+
+    const minutesToBorrow = parseInt(prompt(`Borrow how many minutes from "${sourceTask.name}" (Max: ${sourceMinutes} min)?`));
+
+    if (isNaN(minutesToBorrow) || minutesToBorrow <= 0 || minutesToBorrow > sourceMinutes) {
+        alert("Invalid amount or exceeds available time in the source task.");
+        return;
+    }
+    
+    // Execute transfer
+    const secondsToBorrow = minutesToBorrow * 60;
+
+    // 1. Decrease the source task's duration
+    sourceTask.duration -= secondsToBorrow;
+
+    // 2. Increase the current task's remaining time AND original duration
+    timeRemaining += secondsToBorrow;
+    timeBlocks[currentBlockIndex].duration += secondsToBorrow;
+
+    // 3. Update UI and alert
+    updateDisplay(timeRemaining);
+    renderTimeBlocks(); // Re-render the main list to update task durations
+    showDynamicReallocationInterface(); // Re-render the reallocation list
+
+    alert(`Transferred ${minutesToBorrow} minutes from ${sourceTask.name} to the current task.`);
+}
+
+// --- Feature 2 (Basic) Modification: Export/Import CSV ---
+// Modified export function to include notes array (though notes are complex to handle in simple CSV)
+
+function exportBlocks() {
+    let csvContent = "TaskName,Duration(Minutes)\n"; // Keeping CSV simple for this example
+
+    timeBlocks.forEach(block => {
+        const minutes = block.duration / 60;
+        csvContent += `${block.name.replace(/,/g, '')},${minutes}\n`; // Basic sanitization
+    });
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement("a");
+    const url = URL.createObjectURL(blob);
+    
+    link.setAttribute("href", url);
+    link.setAttribute("download", "timeblocks_agenda.csv");
+    link.style.visibility = 'hidden';
+    
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
+// ... (importBlocks function remains the same) ...
+function importBlocks(event) {
+    if (isRunning) {
+        alert("Cannot import blocks while the timer is running. Please stop the timer first.");
+        return;
+    }
+
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const text = e.target.result;
+        const lines = text.split('\n').filter(line => line.trim() !== '');
+        
+        timeBlocks = [];
+        
+        for (let i = 1; i < lines.length; i++) {
+            const [name, minutesStr] = lines[i].split(',');
+            const minutes = parseFloat(minutesStr);
+            
+            if (name && !isNaN(minutes) && minutes > 0) {
+                addTimeBlock(name.trim(), minutes);
+            }
+        }
+        
+        renderTimeBlocks();
+        updateTotalTime();
+        alert(`Successfully imported ${timeBlocks.length} time blocks.`);
+    };
+
+    reader.readAsText(file);
+}
+// --- Initialization ---
+
+document.addEventListener('DOMContentLoaded', () => {
+    addTimeBlock("Project Overview", 5); 
+    addTimeBlock("Feature Discussion", 10);
+    addTimeBlock("Action Items", 5);
+
+    updateTotalTime(); 
+});
