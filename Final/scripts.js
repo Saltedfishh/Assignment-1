@@ -6,14 +6,14 @@ let timerInterval = null;
 let isRunning = false;
 let isPaused = false;
 
-// --- Feature 2 (Harry, Minghao Yang): Time Block Warning System ---
+// --- Feature 2 (Individual): Time Block Warning System ---
 const WARNING_THRESHOLD_SECONDS = 60; // 1 minute warning
 let warningAlerted = false; // Flag to ensure the warning only triggers once per block
 
-// --- Feature 1 (Yang Pan): Meeting Note Integration ---
+// --- Feature 1 (Individual): Meeting Note Integration ---
 let meetingNotes = []; // Stores all notes: [{blockIndex: 0, timeRemaining: 120, note: "Decision made"}, ...]
 
-// --- Feature 3 (Xingjian Zhang): Dynamic Time Reallocation (Setup) ---
+// --- Feature 3 (Individual): Dynamic Time Reallocation (Setup) ---
 let timeBlocksContainer = null; // Reference to the list container for modification logic
 
 // --- Basic Features (1, 2, 3) Implementation ---
@@ -60,8 +60,8 @@ function renderTimeBlocks() {
         div.className = `time-block-item ${index === currentBlockIndex && isRunning ? 'current-block' : ''}`;
         div.id = `block-${index}`;
 
-        // Add the 'modifiable' class for Feature 3 (Dynamic Reallocation) targetting--Xingjian Zhang
-    if (index > currentBlockIndex && isRunning) {
+        // Add the 'modifiable' class for Feature 3 (Dynamic Reallocation) targetting
+        if (index > currentBlockIndex && isRunning) {
              div.classList.add('modifiable-future-block');
         } else {
              div.classList.remove('modifiable-future-block');
@@ -102,7 +102,6 @@ function removeTimeBlock(index) {
 }
 
 
-// --- Timer Control and Countdown Logic (Extended feature by Minghao Yang) ---
 
 function toggleTimer() {
     if (isRunning) {
@@ -155,7 +154,6 @@ function startCountdown() {
     renderTimeBlocks(); 
 
     timerInterval = setInterval(() => {
-        //  Warning System Check ---
         if (timeRemaining <= WARNING_THRESHOLD_SECONDS && !warningAlerted && timeRemaining > 0) {
             // Trigger visual warning
             document.getElementById('timerDisplay').classList.add('warning-time');
@@ -187,7 +185,25 @@ function startCountdown() {
     }, 1000); 
 }
 
-// --- Feature 3 (Basic) Modification (Modified by Xingjian Zhang) ---
+function pauseResumeTimer() {
+    if (isPaused) {
+        isPaused = false;
+        document.getElementById('pauseResumeBtn').textContent = 'Pause';
+        document.getElementById('modifyBtn').style.display = 'none'; 
+        // Also hide the dynamic reallocation buttons
+        hideDynamicReallocationInterface();
+        startCountdown(); 
+    } else {
+        isPaused = true;
+        clearInterval(timerInterval);
+        document.getElementById('pauseResumeBtn').textContent = 'Resume';
+        document.getElementById('modifyBtn').style.display = 'inline-block'; 
+        // The dynamic reallocation interface can be shown via the Modify button
+    }
+}
+
+
+// --- Feature 3 (Basic) Modification (Modified to integrate F3 Individual) ---
 
 function showModifyInterface() {
     if (!isPaused || !isRunning) {
@@ -211,6 +227,7 @@ function basicAddTime(minutes) {
     renderTimeBlocks();
     alert(`Added ${minutes} minutes to the current task (${timeBlocks[currentBlockIndex].name}). Click Resume to continue.`);
 }
+
 
 // --- Feature 1 (Individual): Meeting Note Integration ---
 
@@ -245,19 +262,6 @@ function saveNote() {
     alert(`Note saved for ${currentTaskName} at ${Math.floor(timeRemaining/60)}:${String(timeRemaining%60).padStart(2, '0')}.`);
 }
 
-function pauseResumeTimer() {
-    if (isPaused) {
-        isPaused = false;
-        document.getElementById('pauseResumeBtn').textContent = 'Pause';
-        document.getElementById('modifyBtn').style.display = 'none'; 
-        // Also hide the dynamic reallocation buttons
-    } else {
-        isPaused = true;
-        clearInterval(timerInterval);
-        document.getElementById('pauseResumeBtn').textContent = 'Resume';
-        // The dynamic reallocation interface can be shown via the Modify button
-    }
-}
 
 // --- Feature 3 (Individual): Dynamic Time Reallocation ---
 
@@ -403,7 +407,6 @@ function importBlocks(event) {
     reader.readAsText(file);
 }
 // --- Initialization ---
-
 document.addEventListener('DOMContentLoaded', () => {
     addTimeBlock("Project Overview", 5); 
     addTimeBlock("Feature Discussion", 10);
