@@ -10,6 +10,9 @@ let isPaused = false;
 const WARNING_THRESHOLD_SECONDS = 60; // 1 minute warning
 let warningAlerted = false; // Flag to ensure the warning only triggers once per block
 
+// --- Feature 1 (Yang Pan): Meeting Note Integration ---
+let meetingNotes = []; // Stores all notes: [{blockIndex: 0, timeRemaining: 120, note: "Decision made"}, ...]
+
 // --- Basic Features (1, 2, 3) Implementation ---
 
 /**
@@ -166,6 +169,38 @@ function startCountdown() {
         timeRemaining--;
         updateDisplay(timeRemaining);
     }, 1000); 
+}
+// --- Feature 1 (Individual): Meeting Note Integration ---
+
+/**
+ * Saves a note with the current timestamp and task context.
+ */
+function saveNote() {
+    const noteInput = document.getElementById('noteInput');
+    const noteText = noteInput.value.trim();
+
+    if (!noteText) {
+        alert("Please enter a note before saving.");
+        return;
+    }
+
+    const currentTaskName = timeBlocks[currentBlockIndex].name;
+
+    meetingNotes.push({
+        blockIndex: currentBlockIndex,
+        taskName: currentTaskName,
+        timeRemaining: timeRemaining, // Remaining time when note was taken
+        timestamp: new Date().toLocaleTimeString(),
+        note: noteText
+    });
+
+    console.log("Note Saved:", meetingNotes[meetingNotes.length - 1]);
+    
+    // Clear input field after saving
+    noteInput.value = '';
+    
+    // Optional: Add visual confirmation (e.g., flash the save button)
+    alert(`Note saved for ${currentTaskName} at ${Math.floor(timeRemaining/60)}:${String(timeRemaining%60).padStart(2, '0')}.`);
 }
 
 function pauseResumeTimer() {

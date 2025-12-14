@@ -30,3 +30,38 @@ body {
     from { opacity: 1; }
     to { opacity: 0.8; }
 }
+/* List Item Styling for Time Blocks */
+.time-block-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+}
+
+.time-block-item:last-child {
+    border-bottom: none;
+}
+
+/* Highlight the current running block */
+.current-block {
+    background-color: #e6f7ff;
+    border: 2px solid #00aaff;
+    border-radius: 5px;
+}
+
+/* Feature 3 (Individual): Dynamic Reallocation Interface Styles */
+.reallocation-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px dashed #eee;
+}
+.reallocation-item button {
+    background-color: #dc3545; /* Red for 'Borrow' action */
+    color: white;
+    width: auto;
+    padding: 5px 10px;
+    margin-left: 10px;
+}
