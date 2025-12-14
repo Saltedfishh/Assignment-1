@@ -1,5 +1,6 @@
 // --- Global State Variables ---
 let timeBlocks = []; // Array to hold all task objects: [{name: 'Task 1', duration: 300, notes: []}, ...] (duration in seconds)
+let timeBlocks = []; // Array to hold all task objects: [{name: 'Task 1', duration: 300, notes: []}, ...] (duration in seconds)
 let currentBlockIndex = 0;
 let timeRemaining = 0; // Time in seconds
 let timerInterval = null;
